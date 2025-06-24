@@ -15,6 +15,24 @@
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    <style>
+        <style>
+        body { font-family: sans-serif; margin: 20px; }
+        .container-content { max-width: 960px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        form div { margin-bottom: 10px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button.delete { background-color: #dc3545; }
+        .alert { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+        .hobi-list { margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
+        .hobi-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dotted #eee; }
+        .hobi-item:last-child { border-bottom: none; }
+        .add-hobi-form { margin-top: 20px; padding: 15px; background-color: #f9f9f9; border: 1px solid #eee; border-radius: 5px; }
+    </style>
 </head>
 <body>
     <div id="app">
@@ -80,16 +98,5 @@
             @yield('content')
         </main>
     </div>
-    <script>
-        document.getElementById('add-hobi').addEventListener('click', function() {
-            const hobiInputs = document.getElementById('hobi-inputs');
-            const newInput = document.createElement('input');
-            newInput.type = 'text';
-            newInput.className = 'form-control mb-2';
-            newInput.name = 'hobis[]';
-            newInput.placeholder = 'Nama Hobi';
-            hobiInputs.appendChild(newInput);
-        });
-    </script>
 </body>
 </html>

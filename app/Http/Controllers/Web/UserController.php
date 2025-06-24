@@ -107,16 +107,6 @@ class UserController extends Controller
         }
         $user->save();
 
-        // Update hobi: hapus semua hobi lama lalu tambahkan yang baru
-        $user->hobis()->delete();
-        if ($request->has('hobis')) {
-            foreach ($request->hobis as $namaHobi) {
-                if (!empty($namaHobi)) {
-                    $user->hobis()->create(['nama_hobi' => $namaHobi]);
-                }
-            }
-        }
-
         return redirect()->route('users.index')->with('success', 'User berhasil diperbarui!');
     }
 

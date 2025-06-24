@@ -1,10 +1,15 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container mt-5">
+    <div class="container-content">
         <h1>Edit User: {{ $user->name }}</h1>
 
-        @if ($errors->any())
-            <div class="alert alert-danger">
+        @if(session('success'))
+            <div class="alert">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if($errors->any())
+            <div style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
                 <ul>
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -13,70 +18,75 @@
             </div>
         @endif
 
+        {{-- Form Edit Data User --}}
         <form action="{{ route('users.update', $user->id) }}" method="POST">
             @csrf
-            @method('PUT') {{-- Penting untuk metode UPDATE --}}
+            @method('PUT') {{-- Atau @method('PATCH') --}}
 
-            <div class="mb-3">
-                <label for="name" class="form-label">Nama:</label>
-                <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $user->name) }}" required>
+            <div>
+                <label for="name">Nama:</label>
+                <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}">
             </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email:</label>
-                <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $user->email) }}" required>
+
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}">
             </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password (kosongkan jika tidak ingin diubah):</label>
-                <input type="password" class="form-control" id="password" name="password">
+
+            <div>
+                <label for="password">Password (kosongkan jika tidak ingin diubah):</label>
+                <input type="password" id="password" name="password">
             </div>
-            <div class="mb-3">
-                <label for="password_confirmation" class="form-label">Konfirmasi Password:</label>
-                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
+
+            <div>
+                <label for="password_confirmation">Konfirmasi Password:</label>
+                <input type="password" id="password_confirmation" name="password_confirmation">
             </div>
-            @if (Auth::user()->role === 'superadmin')
-                <div class="mb-3">
-                    <label for="role" class="form-label">Role:</label>
-                    <select class="form-select" id="role" name="role" required>
-                        <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>User</option>
-                        <option value="superadmin" {{ old('role', $user->role) == 'superadmin' ? 'selected' : '' }}>Superadmin</option>
-                    </select>
-                </div>
-            @endif
-            <div class="mb-3">
-                <label for="hobis" class="form-label">Hobi:</label>
-                <div id="hobi-inputs">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Hobi</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($user->hobis as $hobi)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $hobi->nama_hobi }}</td>
-                                    <td>
-                                        <form action="{{ route('hobis.destroy', $hobi->id) }}" method="POST" style="display:inline-block;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus hobi ini?')">Hapus</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" align="center"><b>Tidak ada hobi</b></td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                <button type="button" class="btn btn-info btn-sm" id="add-hobi">Tambah Kolom Hobi</button>
+
+            <div>
+                <label for="role">Role:</label>
+                <select id="role" name="role">
+                    <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>User</option>
+                    <option value="superadmin" {{ old('role', $user->role) == 'superadmin' ? 'selected' : '' }}>Superadmin</option>
+                </select>
             </div>
-            <button type="submit" class="btn btn-success">Perbarui User</button>
+
+            <button type="submit">Perbarui User</button>
+            <a href="{{ route('users.index') }}" style="margin-left: 10px;">Kembali</a>
         </form>
+
+        {{-- Bagian Hobi --}}
+        <div class="hobi-list mt-5">
+            <h2>Hobi {{ $user->name }}</h2>
+
+            @if($user->hobis->isEmpty())
+                <p>User ini belum memiliki hobi.</p>
+            @else
+                @foreach($user->hobis as $hobi)
+                    <div class="hobi-item">
+                        <span>{{ $hobi->nama_hobi }}</span>
+                        <form action="{{ route('hobis.destroy', $hobi->id) }}" method="POST" style="display:inline-block;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="button delete" onclick="return confirm('Apakah Anda yakin ingin menghapus hobi ini?')">Hapus</button>
+                        </form>
+                    </div>
+                @endforeach
+            @endif
+
+            {{-- Form Tambah Hobi Baru untuk User ini --}}
+            <div class="add-hobi-form">
+                <h3>Tambah Hobi Baru</h3>
+                <form action="{{ route('hobis.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="user_id" value="{{ $user->id }}">
+                    <div>
+                        <label for="nama_hobi">Nama Hobi:</label>
+                        <input type="text" id="nama_hobi" name="nama_hobi" required>
+                    </div>
+                    <button type="submit">Tambah Hobi</button>
+                </form>
+            </div>
+        </div>
     </div>
 @endsection

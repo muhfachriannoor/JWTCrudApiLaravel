@@ -11,17 +11,10 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', function () {
-    return view('home');
-})->middleware(['auth'])->name('home');
-
 // Route untuk CRUD User via Blade (dilindungi middleware 'auth')
 Route::middleware(['auth'])->group(function () {
     Route::resource('users', WebUserController::class);
     Route::post('/hobis', [WebHobbyController::class, 'store'])->name('hobis.store');
     Route::delete('/hobis/{hobi}', [WebHobbyController::class, 'destroy'])->name('hobis.destroy');
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 });
-
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
