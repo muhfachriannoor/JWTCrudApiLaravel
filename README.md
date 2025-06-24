@@ -1,66 +1,317 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Laravel API CRUD User with JWT
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+### Instruksi
 
-## About Laravel
+1. Clone atau Download ke lokal
+2. Masuk ke direktori yang sudah di Clone/Download `cd your-name-directory`
+3. Jalankan semua perintah untuk instalasi laravel seperti `composer install` dll
+4. Jalankan perintah `php artisan migrate` untuk membuat tabel melalui migration
+5. Jalankan perintah `php artisan db:seed` untuk mengisi data di tabel dengan data seeder
+6. Jalankan perintah `composer run dev` untuk menjalankan program dalam development
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### List Endpoints
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| API Endpoint    | Method | Deksripsi                        |
+| --------------- | ------ | -------------------------------- |
+| `/api/register`| POST | Register User Baru |
+| `/api/login`| POST | Login User |
+| `/api/users`| GET | Menampilkan semua data user |
+| `/api/users/:id`| GET | Menampilkan data user sesuai params ID |
+| `/api/users` | POST | Menambahkan user baru |
+| `/api/users/:id` | PUT | Mengubah data user sesuai params ID |
+| `/api/users/:id` | DELETE | Menghapus data user sesuai params ID |
+| `/api/users/:id/hobby` | POST | Menambahkan hobi baru sesuai dengan params ID user |
+| `/api/hobby/:id` | DELETE | Menghapus data hobi sesuai params ID |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Contoh Data
 
-## Learning Laravel
+- **Register User Baru**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+  - **Request**
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+    - Endpoint : `/api/register`
+    - Method : `POST`
+    - Body : `RAW JSON`
+    - ```json
+      {
+          "name": "Zone",
+          "email": "zone@mail.com",
+          "password": "zone93",
+          "password_confirmation": "zone93"
+      }
+      ```
+  - **Response**
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+  ```json
+  {
+      "message": "User succesfully registered",
+      "user": {
+          "name": "Zone",
+          "email": "zone@mail.com",
+          "role": "user",
+          "updated_at": "2025-06-24T13:20:06.000000Z",
+          "created_at": "2025-06-24T13:20:06.000000Z",
+          "id": 3
+        }
+  }
+  ```
 
-## Laravel Sponsors
+- **Login User**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+  - **Request**
 
-### Premium Partners
+    - Endpoint : `/api/login`
+    - Method : `POST`
+    - Body : `RAW JSON`
+    - ```json
+      {
+          "email": "superadmin@mail.com",
+          "password": "superadmin",
+      }
+      ```
+  - **Response**
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+  ```json
+  {
+      "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzUwNzcxMzc0LCJleHAiOjE3NTA3NzQ5NzQsIm5iZiI6MTc1MDc3MTM3NCwianRpIjoidHdqd01sU0RZc3lxbVFtVyIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3Iiwicm9sZSI6InN1cGVyYWRtaW4iLCJlbWFpbCI6InN1cGVyYWRtaW5AbWFpbC5jb20ifQ.unA1x46HyhOHUwTTJm633snR_7htMdvwTM9377kcY8o",
+      "token_type": "bearer",
+      "expires_in": 3600,
+      "user": {
+          "id": 1,
+          "name": "Super Admin",
+          "email": "superadmin@mail.com",
+          "email_verified_at": "2025-06-24T13:14:19.000000Z",
+          "role": "superadmin",
+          "created_at": "2025-06-24T13:14:19.000000Z",
+          "updated_at": "2025-06-24T13:14:19.000000Z"
+      }
+  }
+  ```
 
-## Contributing
+- **Menampilkan semua data user**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+  - **Request**
 
-## Code of Conduct
+    - Endpoint : `/api/users`
+    - Method : `GET`
+    - Authorization : `Bearer Token`
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+  - **Response**
 
-## Security Vulnerabilities
+  ```json
+  {
+      {
+          "id": 1,
+          "name": "Super Admin",
+          "email": "superadmin@mail.com",
+          "email_verified_at": "2025-06-24T13:14:19.000000Z",
+          "role": "superadmin",
+          "created_at": "2025-06-24T13:14:19.000000Z",
+          "updated_at": "2025-06-24T13:14:19.000000Z",
+          "hobis": []
+      },
+      {
+          "id": 2,
+          "name": "Zone",
+          "email": "zone@mail.com",
+          "email_verified_at": null,
+          "role": "user",
+          "created_at": "2025-06-24T13:20:06.000000Z",
+          "updated_at": "2025-06-24T13:20:06.000000Z",
+          "hobis": []
+      },
+  }
+  ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **Menampilkan data user sesuai params ID**
 
-## License
+  - **Request**
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+    - Endpoint : `/api/users/:id`
+    - Params : `id: 2`
+    - Method : `GET`
+    - Authorization : `Bearer Token`
+
+  - **Response**
+
+  ```json
+  {
+      {
+          "id": 2,
+          "name": "Zone",
+          "email": "zone@mail.com",
+          "email_verified_at": null,
+          "role": "user",
+          "created_at": "2025-06-24T13:20:06.000000Z",
+          "updated_at": "2025-06-24T13:20:06.000000Z",
+          "hobis": []
+      }
+  }
+  ```
+
+- **Menambahkan user baru**
+
+  - **Request**
+
+    - Endpoint : `/api/users`
+    - Method : `POST`
+    - Authorization : `Bearer Token`
+    - Body : `RAW JSON`
+    - ```json
+      {
+          "name": "New User1",
+          "email": "newuser1@example.com",
+          "password": "user1",
+          "role": "user",
+          "hobis": [
+              {"nama_hobi": "Gaming"},
+              {"nama_hobi": "Coding"}
+          ]
+      }
+      ```
+  - **Response**
+
+  ```json
+  {
+      "message": "User created successfully",
+      "user": {
+          "name": "New User1",
+          "email": "newuser1@example.com",
+          "role": "user",
+          "updated_at": "2025-06-24T13:23:39.000000Z",
+          "created_at": "2025-06-24T13:23:39.000000Z",
+          "id": 3,
+          "hobis": [
+              {
+                  "id": 1,
+                  "user_id": 4,
+                  "nama_hobi": "Gaming",
+                  "created_at": "2025-06-24T13:23:39.000000Z",
+                  "updated_at": "2025-06-24T13:23:39.000000Z"
+              },
+              {
+                  "id": 2,
+                  "user_id": 4,
+                  "nama_hobi": "Coding",
+                  "created_at": "2025-06-24T13:23:39.000000Z",
+                  "updated_at": "2025-06-24T13:23:39.000000Z"
+              }
+          ]
+      }
+  }
+  ```
+
+  - **Mengubah data user sesuai params ID**
+
+  - **Request**
+
+    - Endpoint : `/api/users/:id`
+    - Params : `id: 3`
+    - Method : `PUT`
+    - Authorization : `Bearer Token`
+    - Body : `RAW JSON`
+    - ```json
+      {
+          "name": "New User1 Updated",
+          "email": "newuser1up@example.com",
+          "password": "user1up",
+          "role": "user",
+          "hobis": [
+              {"nama_hobi": "Gaming Valorant"},
+              {"nama_hobi": "Coding PHP"}
+          ]
+      }
+      ```
+  - **Response**
+
+  ```json
+  {
+      "message": "User updated successfully",
+      "user": {
+          "id": 2,
+          "name": "New User1 Updated",
+          "email": "newuser1up@example.com",
+          "email_verified_at": null,
+          "role": "user",
+          "created_at": "2025-06-24T13:23:39.000000Z",
+          "updated_at": "2025-06-24T13:46:53.000000Z",
+          "hobis": [
+              {
+                  "id": 5,
+                  "user_id": 4,
+                  "nama_hobi": "Gaming Valorant",
+                  "created_at": "2025-06-24T13:46:53.000000Z",
+                  "updated_at": "2025-06-24T13:46:53.000000Z"
+              },
+              {
+                  "id": 6,
+                  "user_id": 4,
+                  "nama_hobi": "Coding PHP",
+                  "created_at": "2025-06-24T13:46:53.000000Z",
+                  "updated_at": "2025-06-24T13:46:53.000000Z"
+              }
+          ]
+      }
+  }
+  ```
+
+  - **Menghapus data user sesuai params ID**
+
+  - **Request**
+
+    - Endpoint : `/api/users/:id`
+    - Params : `id: 3`
+    - Method : `DELETE`
+    - Authorization : `Bearer Token`
+  - **Response**
+
+  ```json
+  {
+      "message": "User deleted successfully"
+  }
+  ```
+
+  - **Menambahkan hobi baru sesuai dengan params ID user**
+
+  - **Request**
+
+    - Endpoint : `/api/users/:id/hobby`
+    - Params : `id: 1`
+    - Method : `PUT`
+    - Authorization : `Bearer Token`
+    - Body : `RAW JSON`
+    - ```json
+      {
+          "nama_hobi": "Olahraga",
+      }
+      ```
+  - **Response**
+
+  ```json
+  {
+      "message": "Hobi added successfully",
+      "hobi": {
+          "nama_hobi": "Olahraga",
+          "user_id": 1,
+          "updated_at": "2025-06-24T13:38:47.000000Z",
+          "created_at": "2025-06-24T13:38:47.000000Z",
+          "id": 4
+    }
+  }
+  ```
+
+  - **Menghapus data hobi sesuai params ID**
+
+  - **Request**
+
+    - Endpoint : `/api/hobby/:id`
+    - Params : `id: 4`
+    - Method : `DELETE`
+    - Authorization : `Bearer Token`
+  - **Response**
+
+  ```json
+  {
+      "message": "Hobi deleted successfully"
+  }
+  ```
