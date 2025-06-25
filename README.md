@@ -4,10 +4,11 @@
 
 1. Clone atau Download ke lokal
 2. Masuk ke direktori yang sudah di Clone/Download `cd your-name-directory`
-3. Jalankan semua perintah untuk instalasi laravel seperti `composer install` dll
-4. Jalankan perintah `php artisan migrate` untuk membuat tabel melalui migration
-5. Jalankan perintah `php artisan db:seed` untuk mengisi data di tabel dengan data seeder
-6. Jalankan perintah `composer run dev` untuk menjalankan program dalam development
+3. Jalankan semua perintah untuk instalasi laravel seperti `composer install` `npm install`
+4. Jalankan perintah `php artisan jwt:secret` untuk membuat secret jwt di file `.env`
+5. Jalankan perintah `php artisan migrate` untuk membuat tabel melalui migration
+6. Jalankan perintah `php artisan db:seed` untuk mengisi data di tabel dengan data seeder
+7. Jalankan perintah `composer run dev` untuk menjalankan program dalam development
 
 ### List Endpoints
 
