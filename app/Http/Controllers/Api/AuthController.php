@@ -8,73 +8,90 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function __construct()
-    {
-        // Middleware 'auth:api' untuk semua method kecuali 'login' dan 'register'
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
-    }
 
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|confirmed|min:5',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|between:2,100',
+                'email' => 'required|string|email|max:100|unique:users',
+                'password' => 'required|string|confirmed|min:5',
+            ]);
 
-        if($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            if($validator->fails()) {
+                return response()->json($validator->errors(), 400);
+            }
+
+            $user = User::create(array_merge(
+                $validator->validated(),
+                ['password' => Hash::make($request->password), 'role' => 'user']
+            ));
+
+            return response()->json([
+                'message' => 'User succesfully registered',
+                'user' => $user
+            ], 201);
+        } catch (JWTException $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode());
         }
-
-        $user = User::create(array_merge(
-            $validator->validated(),
-            ['password' => Hash::make($request->password), 'role' => 'user']
-        ));
-
-        return response()->json([
-            'message' => 'User succesfully registered',
-            'user' => $user
-        ], 201);
     }
 
     public function login(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required|string|min:5',
-        ]);
 
-        if($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+        try {
+             $validator = Validator::make($request->all(), [
+                'email' => 'required|email',
+                'password' => 'required|string|min:5',
+            ]);
+
+            if($validator->fails()) {
+                return response()->json($validator->errors(), 422);
+            }
+
+            if(!$token = auth()->guard('api')->attempt($validator->validated())) {
+                return response()->json([
+                    'message' => 'Email atau Password Anda salah'
+                ], 401);
+            }
+
+            return $this->respondWithToken($token);
+        } catch (JWTException  $th) {
+            return response()->json(['error' => 'Could not create token'], 500);
         }
-
-        if(!$token = auth()->guard('api')->attempt($validator->validated())) {
-            return response()->json([
-                'message' => 'Email atau Password Anda salah'
-            ], 401);
-        }
-
-
-        return $this->respondWithToken($token);
     }
 
     public function me()
     {
-        return response()->json(auth()->user());
+        try {
+            return response()->json(auth()->user());
+        } catch (JWTException $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode());
+        }
     }
 
     public function logout()
     {
-        auth()->logout();
-        return response()->json(['message' => 'User successfully signed out']);
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken());
+            return response()->json(['message' => 'Successfully logged out']);
+        } catch (JWTException $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode());
+        }
     }
 
     public function refresh()
     {
-        return $this->respondWithToken(auth()->refresh());
+        try {
+            return $this->respondWithToken(auth()->refresh());
+        } catch (JWTException $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode());
+        }
     }
 
     protected function respondWithToken($token)
