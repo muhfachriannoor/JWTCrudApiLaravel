@@ -21,6 +21,5 @@ class Controller extends BaseController
                 echo $i . '<br>';
             }
         }
-        // echo 'test';
     }
 }
